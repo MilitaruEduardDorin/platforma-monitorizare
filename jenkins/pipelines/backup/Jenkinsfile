@@ -1,4 +1,4 @@
-# Pipeline Jenkins pentru CI/CD al scriptului python de backup.
+//# Pipeline Jenkins pentru CI/CD al scriptului python de backup.
 pipeline {
   agent any
   options {

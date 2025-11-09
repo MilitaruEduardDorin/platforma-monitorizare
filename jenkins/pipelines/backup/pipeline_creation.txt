@@ -1,0 +1,5 @@
+New Item -> Pipeline (proiect-final-backup)
+    Pipeline -> definition: Pipeline script from SCM
+        SCM: Git
+        Repository URL: https://github.com/MilitaruEduardDorin/platforma-monitorizare.git
+        Script Path: jenkins/pipelines/backup/Jenkinsfile ((path-ul e cel din git repository, nu de pe VM))
