@@ -1,0 +1,82 @@
+============================================================
+  STARE SISTEM (monitorizare) — 2025-11-06 13:26:50 EET (local) | 2025-11-06T11:26:50Z (UTC)
+============================================================
+
+[Host]
+  Hostname       : ubuntu
+  OS             : Ubuntu 25.10
+  Kernel         : 6.17.0-6-generic aarch64
+  Uptime         : up 4 hours, 27 minutes
+  Load Average   : 0.18 0.10 0.13
+
+[CPU]
+  User           : %Cpu(s):
+  System         : 1.9
+  Idle           : 98.1
+
+[Memorie] (MB)
+  Total          : 5.3Gi
+  Utilizată      : 2.2Gi
+  Liberă         : 835Mi
+  Buff/Cache     : 2.5Gi
+  Shared         : 117Mi
+  Disponibilă    : 3.1Gi
+
+[Procese]
+  Număr procese  : 248
+  Top 10 după CPU:
+ USER                 PID     COMMAND                %CPU   %MEM
+ eu                   3979    code                    3.6    7.4
+ eu                   3080    gnome-shell             3.1    8.4
+ eu                   3952    code                    2.3    3.8
+ eu                   2495    java                    0.4    6.5
+ eu                   3912    code                    0.3    4.0
+ eu                   4087    code                    0.3    2.1
+ eu                   3556    Xwayland                0.2    1.6
+ root                 11577   kworker/u20:2-k         0.1    0.0
+ eu                   13797   bash                    0.1    0.0
+ root                 13285   kworker/u20:3-k         0.1    0.0
+
+  Top 10 după MEM:
+ USER                 PID     COMMAND                %CPU   %MEM
+ eu                   3080    gnome-shell             3.1    8.4
+ eu                   3979    code                    3.6    7.4
+ eu                   2495    java                    0.4    6.5
+ eu                   3912    code                    0.3    4.0
+ eu                   3952    code                    2.3    3.8
+ eu                   4028    code                    0.0    2.9
+ eu                   4043    code                    0.0    2.1
+ eu                   4087    code                    0.3    2.1
+ eu                   4038    code                    0.0    2.1
+ eu                   3716    mutter-x11-fram         0.0    2.0
+
+[Disk Usage]
+ Filesystem         Type     Size   Used  Avail   Use%  Mounted
+ tmpfs              tmpfs    539M   1.8M   538M     1%  /run
+ /dev/sda2          ext4      73G    24G    46G    34%  /
+ tmpfs              tmpfs    2.7G    71M   2.6G     3%  /dev/shm
+ efivarfs           efivarfs   256K   102K   155K    40%  /sys/firmware/efi/efivars
+ tmpfs              tmpfs    5.0M   8.0K   5.0M     1%  /run/lock
+ tmpfs              tmpfs    2.7G   8.0K   2.7G     1%  /tmp
+ tmpfs              tmpfs    1.0M      0   1.0M     0%  /run/credentials/systemd-journald.service
+ tmpfs              tmpfs    1.0M      0   1.0M     0%  /run/credentials/systemd-resolved.service
+ /dev/sda1          vfat     1.1G   6.6M   1.1G     1%  /boot/efi
+ shared-with-host   vboxsf   461G   240G   222G    52%  /home/eu/shared-with-host
+ tmpfs              tmpfs    539M    96K   539M     1%  /run/user/1000
+ /dev/sr0           iso9660    51M    51M      0   100%  /media/eu/VBox_GAs_7.2.21
+
+[Rețea]
+  Interfețe:
+ lo         UNKNOWN 127.0.0.1/8 ::1/128 
+ enp0s8     UP     10.0.2.15/24 fd17:625c:f037:2:e13f:e459:38b:722/64 fd17:625c:f037:2:a00:27ff:fe23:6ac1/64 fe80::a00:27ff:fe23:6ac1/64 
+ enp0s9     UP     192.168.3.133/24 fe80::fcb7:f341:ddb3:c506/64 
+ br-3fe278b18e24 DOWN   192.168.49.1/24 
+ docker0    DOWN   172.17.0.1/16 
+ br-deab9c5020bc UP     172.18.0.1/16 fe80::8c56:47ff:feee:5ae5/64 
+ veth4108c04@if2 UP     fe80::b073:6aff:fe38:47fc/64 
+
+  Rute implicite:
+default via 10.0.2.2 dev enp0s8 proto dhcp src 10.0.2.15 metric 100 
+default via 192.168.3.1 dev enp0s9 proto dhcp src 192.168.3.133 metric 101 
+
+(Note) Acest fișier este suprascris la fiecare ciclu (interval: 5s).

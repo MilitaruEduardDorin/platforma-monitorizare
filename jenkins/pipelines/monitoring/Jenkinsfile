@@ -1,1 +1,91 @@
-# Pipeline Jenkins pentru CI/CD al scriptului Python.
+# Pipeline Jenkins pentru CI/CD al scriptului Python. 
+pipeline {
+  agent any
+  options {
+    timestamps()
+    ansiColor('xterm')
+  }
+
+  environment {
+    DOCKERHUB_NAMESPACE = 'militarueduarddorin'
+    IMAGE_NAME          = 'monitorizare'
+    IMAGE               = "${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}"
+    DOCKERHUB_CREDS_ID  = 'dockerhub-credentials'
+    GIT_SHA             = "${env.GIT_COMMIT?.take(7) ?: 'local'}"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh 'echo "Commit: $(git log -1 --oneline)"'
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          echo "--- Construiesc imaginea Docker ---"
+          docker build \
+            -f docker/monitoring/Dockerfile \
+            -t ${IMAGE}:${GIT_SHA} \
+            -t ${IMAGE}:latest \
+            .
+        '''
+      }
+    }
+
+    stage('Push to Docker Hub') {
+      when {
+        anyOf { branch 'main'; branch 'master' }
+      }
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: "${DOCKERHUB_CREDS_ID}",
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh '''
+            echo "--- Login in Docker Hub ---"
+            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+            echo "--- Push imagine ---"
+            docker push ${IMAGE}:${GIT_SHA}
+            docker push ${IMAGE}:latest
+
+            docker logout || true
+          '''
+        }
+      }
+    }
+
+    stage('Deploy Container (local)') {
+      steps {
+        sh '''
+          echo "--- Rulez containerul pentru test ---"
+          docker rm -f monitorizare || true
+          docker run -d --name monitorizare \
+            -e INTERVAL_RULARE=5 \
+            -e TOP_PROCESE=10 \
+            -v $(pwd)/logs:/logs \
+            ${IMAGE}:latest
+          echo "--- Container monitorizare pornit ---"
+          docker ps --filter "name=monitorizare"
+        '''
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Verific imagini Docker..."
+      sh 'docker image ls | grep monitorizare || true'
+    }
+    success {
+      echo "Pipeline reușit: imagine ${IMAGE} construită și publicată."
+    }
+    failure {
+      echo "Pipeline eșuat: verifică logurile de build/push/deploy."
+    }
+  }
+}

@@ -1,0 +1,22 @@
+#push imagin
+docker login
+docker images
+docker tag proiect-final/monitorizare:latest militarueduarddorin/monitorizare:latest
+docker push militarueduarddorin/monitorizare:latest
+
+#build din /home/eu/Proiect_final (context) pt a avea acces la scriptul de monitorizare
+docker build -t militarueduarddorin/monitorizare:latest -f docker/monitoring/Dockerfile /home/eu/Proiect_final
+
+#run
+mkdir -p /home/eu/Proiect_final/logs #pt a avea folderul de logs ( si il montam ca volum din host la container)
+    #supreascriere variabile la rulare
+docker run --rm -it \
+  -e INTERVAL_RULARE=3 \
+  -e TOP_PROCESE=8 \
+  -e LOG_FILE=/logs/VM-state.log \
+  -v "$PWD/logs:/logs" \
+  --name monitorizare \
+  militarueduarddorin/monitorizare:latest
+
+#verificare loguri
+docker logs -f monitorizare

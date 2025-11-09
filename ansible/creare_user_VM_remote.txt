@@ -1,0 +1,27 @@
+sudo adduser proiect_final
+
+sudo usermod -aG sudo proiect_final
+
+#setare fara parola la rularea cu sudo
+echo 'proiect_final ALL=(ALL) NOPASSWD:ALL'|sudo tee /etc/sudoers.d/proiect_final >/dev/null
+sudo chmod 440 /etc/sudoers.d/proiect_final
+
+#citim cheia publica a userului eu de pe VM ubuntu (cu ansible)
+cat ~/.ssh/id_rsa.pub
+
+#adaugam cheie publica (eu@ubuntu) pe VM remote (proiect_final@remote)
+mkdir .ssh
+touch ~/.ssh/authorized_keys
+echo “pub_hey_eu@ubuntu” >> ~/.ssh/authorized_keys
+cat ~/.ssh/authorized_keys
+
+#instalam SSH server pe VM remote
+sudo apt update
+sudo apt install -y openssh-server
+service ssh status
+
+service ssh start
+
+#verificari
+    VM remote: ip addr | grep 192.168 (!!!nu se termina in 1)
+    VM ubuntu: ssh proiect_final@192.168.3.134

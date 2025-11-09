@@ -1,0 +1,62 @@
+============================================================
+  STARE SISTEM (monitorizare) — 2025-11-06 13:28:23 UTC (local) | 2025-11-06T13:28:23Z (UTC)
+============================================================
+
+[Host]
+  Hostname       : 7064e4e273b8
+  OS             : Ubuntu 24.04.3 LTS
+  Kernel         : 6.17.0-6-generic aarch64
+  Uptime         : up 6 hours, 29 minutes
+  Load Average   : 0.26 0.24 0.18
+
+[CPU]
+  User           : %Cpu(s):
+  System         : 2.0
+  Idle           : 98.0
+
+[Memorie]
+  Total          : 5.3Gi
+  Utilizată      : 2.3Gi
+  Liberă         : 425Mi
+  Buff/Cache     : 2.9Gi
+  Shared         : 142Mi
+  Disponibilă    : 3.0Gi
+
+[Procese]
+  Număr procese  : 5
+  Top 8 după CPU:
+ USER                 PID     COMMAND                %CPU   %MEM
+ root                 1       bash                    0.2    0.0
+ root                 314     bash                    0.0    0.0
+ root                 315     ps                      0.0    0.0
+ root                 316     head                    0.0    0.0
+ root                 317     awk                     0.0    0.0
+
+  Top 8 după MEM:
+ USER                 PID     COMMAND                %CPU   %MEM
+ root                 319     ps                      0.0    0.0
+ root                 1       bash                    0.2    0.0
+ root                 321     awk                     0.0    0.0
+ root                 318     bash                    0.0    0.0
+ root                 320     head                    0.0    0.0
+
+[Disk Usage]
+ Filesystem         Type     Size   Used  Avail   Use%  Mounted
+ overlay            overlay    73G    24G    46G    34%  /
+ tmpfs              tmpfs     64M      0    64M     0%  /dev
+ shm                tmpfs     64M      0    64M     0%  /dev/shm
+ /dev/sda2          ext4      73G    24G    46G    34%  /logs
+ tmpfs              tmpfs    2.7G      0   2.7G     0%  /proc/asound
+ tmpfs              tmpfs    2.7G      0   2.7G     0%  /proc/acpi
+ tmpfs              tmpfs    2.7G      0   2.7G     0%  /proc/scsi
+ tmpfs              tmpfs    2.7G      0   2.7G     0%  /sys/firmware
+
+[Rețea]
+  Interfețe:
+ lo         UNKNOWN 127.0.0.1/8 ::1/128 
+ eth0@if22  UP     172.17.0.2/16 
+
+  Rute implicite:
+default via 172.17.0.1 dev eth0 
+
+(Note) Acest fișier este suprascris la fiecare ciclu (interval: 3s).

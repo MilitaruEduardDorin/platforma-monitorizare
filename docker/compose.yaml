@@ -1,1 +1,33 @@
-# Configurație pentru rularea ambelor containere Docker.
+# Configuratie pentru rularea ambelor containere Docker.services:
+services:
+  monitorizare:
+    build:
+      context: ..
+      dockerfile: docker/monitoring/Dockerfile
+    image: proiect-final/monitorizare:latest
+    container_name: monitorizare
+    environment:
+      INTERVAL_RULARE: "${INTERVAL_RULARE:-5}"
+      TOP_PROCESE: "${TOP_PROCESE:-10}"
+      LOG_FILE: "/logs/VM-state.log"
+      LC_ALL: "C"
+    volumes:
+      - ../logs:/logs
+    restart: unless-stopped
+  
+  backup:
+    build:
+      context: ..
+      dockerfile: docker/backup/Dockerfile
+    image: proiect-final/backup:latest
+    container_name: backup
+    environment:
+      SOURCE_FILE: "/logs/VM-state.log"
+      BACKUP_DIR: "/backup"
+      BACKUP_INTERVAL: "${BACKUP_INTERVAL:-5}"
+    volumes:
+      - ../logs:/logs
+      - ../backup:/backup
+    restart: unless-stopped
+    depends_on:
+      - monitorizare

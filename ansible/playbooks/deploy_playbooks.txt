@@ -1,0 +1,8 @@
+#!!!De rulat din ~/Proiect_final/ansible$
+#verificare ca pot accesa VM remote
+ansible -i inventory.ini remote -m ping
+
+#deploy playbooks
+ansible-playbook -i inventory.ini playbooks/install_docker.yml
+ansible-playbook -i inventory.ini playbooks/deploy_platform.yml
+

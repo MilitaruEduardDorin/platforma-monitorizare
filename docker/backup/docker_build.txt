@@ -1,0 +1,23 @@
+#push imagin
+docker login
+docker images
+docker tag proiect-final/backup:latest militarueduarddorin/backup:latest
+docker push militarueduarddorin/backup:latest
+
+#build din /home/eu/Proiect_final (context) pt a avea acces la scriptul de backup
+docker build -t militarueduarddorin/backup:latest -f docker/backup/Dockerfile /home/eu/Proiect_final
+
+#run
+mkdir -p /home/eu/Proiect_final/logs /home/eu/Proiect_final/backup #pt a avea directoarele de logs si backup (si le montam la container ca vol din host)
+    #supreascriere variabile la rulare
+docker run --rm -it \
+  -e SOURCE_FILE=/logs/VM-state.log \
+  -e BACKUP_DIR=/backup \
+  -e BACKUP_INTERVAL=5 \
+  -v "$PWD/logs:/logs" \
+  -v "$PWD/backup:/backup" \
+  --name backup \
+  militarueduarddorin/backup:latest
+
+#verificare loguri
+docker logs -f backup

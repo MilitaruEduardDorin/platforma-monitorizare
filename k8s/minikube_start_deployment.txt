@@ -1,0 +1,29 @@
+#la pornirea VM-ului
+minikube start
+
+# incarca imaginile locale in minikube (fiindca inca nu le-am facut publice)
+minikube image load proiect-final/monitorizare:latest
+minikube image load proiect-final/backup:latest
+
+# aplica manifest
+kubectl apply -f /home/eu/Proiect_final/k8s/deployment.yaml
+
+#restart
+kubectl -n monitoring rollout restart deployment/system-monitor
+kubectl -n monitoring rollout status  deployment/system-monitor
+
+# verifica resursele
+kubectl -n monitoring get all
+kubectl -n monitoring get pods
+kubectl -n monitoring describe pod -l app=system-monitor
+
+# vezi logurile
+kubectl -n monitoring logs -l app=system-monitor -c monitorizare --tail=50
+kubectl -n monitoring logs -l app=system-monitor -c backup --tail=50
+
+# acceseaza Nginx
+minikube ip
+http://<IP_MINIKUBE>:30880/
+
+#verificare namespace
+kubectl get ns

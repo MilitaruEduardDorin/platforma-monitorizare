@@ -1,1 +1,37 @@
-# Playbook Ansible pentru instalarea Docker pe server.
+---
+- name: Verificare existenta Docker si install daca Docker nu e pe remote
+  hosts: remote
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Verificare prezenta Docker
+      command: docker --version
+      register: docker_version
+      changed_when: false
+      failed_when: false
+
+    - name: Afisare versiune Docker prezent pe remote
+      debug:
+        msg: "{{ docker_version.stdout | default('Docker nu este instalat') }}"
+
+    - name: Instalez docker doar daca lipseste
+      apt:
+        name: docker.io
+        update_cache: yes
+        state: present
+      when: docker_version.rc != 0
+
+    - name: Pornesc si activez docker
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Adaug userul in grupul docker
+      user:
+        name: proiect_final
+        groups: docker
+        append: true
+
+    - meta: reset_connection

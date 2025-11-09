@@ -1,0 +1,21 @@
+minikube addons enable metrics-server
+
+# creeaza/actualizeaza HPA
+kubectl apply -f /home/eu/Proiect_final/k8s/hpa.yaml
+
+# vezi HPA
+kubectl -n monitoring get hpa
+kubectl -n monitoring describe hpa system-monitor-hpa
+
+# urmareste replicile deployment-ului
+kubectl -n monitoring get deploy/system-monitor -w
+kubectl -n monitoring get pods -l app=system-monitor -w
+
+#verificari
+kubectl top nodes
+kubectl -n monitoring top pods
+
+#test hpa
+kubectl -n monitoring exec -it <un_pod> -c monitorizare -- sh -lc "yes > /dev/null"
+
+

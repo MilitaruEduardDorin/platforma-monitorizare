@@ -1,1 +1,107 @@
 # Pipeline Jenkins pentru CI/CD al scriptului python de backup.
+pipeline {
+  agent any
+  options {
+    timestamps()
+    ansiColor('xterm')
+  }
+
+  environment {
+    // === DOCKER HUB ===
+    DOCKERHUB_NAMESPACE = 'militarueduarddorin'    // ← contul  Docker Hub
+    IMAGE_NAME          = 'backup'                 // ← numele repo-ului din Docker Hub
+    IMAGE               = "${DOCKERHUB_NAMESPACE}/${IMAGE_NAME}"
+
+    // ID-ul credentialelor Jenkins (Username + Token Docker Hub)
+    DOCKERHUB_CREDS_ID  = 'dockerhub-credentials'
+
+    // Taguri utile pentru build
+    GIT_SHA             = "${env.GIT_COMMIT?.take(7) ?: 'local'}"
+    BUILD_TAG_SAFE      = "${env.BUILD_NUMBER}"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh 'echo "Commit: $(git log -1 --oneline)"'
+      }
+    }
+
+    stage('Lint Python') {
+      steps {
+        sh '''
+          echo "--- Lint: flake8 & black ---"
+          python3 -m pip install --upgrade pip >/dev/null 2>&1 || true
+          python3 -m pip install flake8 black >/dev/null 2>&1
+          flake8 scripts/backup_VM_ubuntu.py --max-line-length=120
+          black --check scripts/backup_VM_ubuntu.py
+        '''
+      }
+    }
+
+    stage('Unit Tests (pytest)') {
+      steps {
+        sh '''
+          echo "--- Rulez teste ---"
+          python3 -m pip install pytest >/dev/null 2>&1 || true
+          if [ -d tests ] || ls -1 test_*.py >/dev/null 2>&1; then
+            pytest -q
+          else
+            echo "Nu există teste definite. Continui pipeline-ul."
+          fi
+        '''
+      }
+    }
+
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          echo "--- Construiesc imaginea Docker ---"
+          docker build \
+            -f docker/backup/Dockerfile \
+            -t ${IMAGE}:${GIT_SHA} \
+            -t ${IMAGE}:latest \
+            .
+        '''
+      }
+    }
+
+    stage('Push to Docker Hub') {
+      when {
+        anyOf { branch 'main'; branch 'master' }    // Doar pentru branchul principal
+      }
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: "${DOCKERHUB_CREDS_ID}",
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh '''
+            echo "--- Autentificare Docker Hub ---"
+            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+
+            echo "--- Push imagini ---"
+            docker push ${IMAGE}:${GIT_SHA}
+            docker push ${IMAGE}:latest
+
+            docker logout || true
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "--- Curăț output ---"
+      sh 'docker image ls | head -n 15 || true'
+    }
+    success {
+      echo "Pipeline reușit pentru ${IMAGE}"
+    }
+    failure {
+      echo "Pipeline eșuat pentru ${IMAGE}"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+1) Rulare cu valori implicite (scrie/overwrite la fiecare 5s)
+./monitorizare_VM_ubuntu.sh
+
+2) Rulare cu interval personalizat (ex: 2 secunde) și alt fișier
+INTERVAL_RULARE=2 LOG_FILE=/tmp/VM-state.log ./monitorizare_VM_ubuntu.sh
+
+3) Afișează doar primele 3 procese "top"
+TOP_PROCESE=3 ./monitorizare_VM_ubuntu.sh

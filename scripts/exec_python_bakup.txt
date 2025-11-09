@@ -1,0 +1,3 @@
+cd /home/eu/Proiect_final
+
+SOURCE_FILE=logs/VM-state.log BACKUP_DIR=backup BACKUP_INTERVAL=5 python3 scripts/backup_VM_ubuntu.py

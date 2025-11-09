@@ -1,1 +1,150 @@
 # Puneti aici tot ce aveti nevoie pentru deployment (Namespace, pods, volumes, etc)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    project: proiect-final
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-logs-conf
+  namespace: monitoring
+data:
+#Se va accesa prin minikube ip, nu ii setam nume
+  default.conf: |
+    server {
+      listen 80;
+      server_name _;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime on;
+
+      # vedem continutul din volumul /logs
+      location / {
+        alias /logs/;
+        add_header Cache-Control "no-store";
+      }
+
+      #vedem continutul din volumul /backup
+      location /backup {
+        alias /backup;
+        add_header Cache-Control "no-store";
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: system-monitor
+  namespace: monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: system-monitor
+  template:
+    metadata:
+      labels:
+        app: system-monitor
+    spec:
+      containers:
+        - name: monitorizare
+          image: proiect-final/monitorizare:latest
+          #pentru a folosi mereu docker images locale
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: INTERVAL_RULARE
+              value: "5"
+            - name: TOP_PROCESE
+              value: "10"
+            - name: LOG_FILE
+              value: "/logs/VM-state.log"
+            - name: LC_ALL
+              value: "C"
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+
+        - name: backup
+          image: proiect-final/backup:latest
+          #pentru a folosi mereu docker images locale
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SOURCE_FILE
+              value: "/logs/VM-state.log"
+            - name: BACKUP_DIR
+              value: "/backup"
+            - name: BACKUP_INTERVAL
+              value: "5"
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+            - name: backup
+              mountPath: /backup
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+              readOnly: true
+            - name: backup
+              mountPath: /backup
+              readOnly: true
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+          resources:
+            requests:
+              cpu: "20m"
+              memory: "32Mi"
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+
+      # Volumele folosite in pod de cele 3 containere
+      volumes:
+        - name: logs
+          emptyDir: {} #PersistentVolumeClaim
+        - name: backup
+          emptyDir: {} #PersistentVolumeClaim
+        - name: nginx-conf
+          configMap:
+            name: nginx-logs-conf
+            items:
+              - key: default.conf
+                path: default.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: system-monitor-svc
+  namespace: monitoring
+spec:
+  type: NodePort
+  selector:
+    app: system-monitor
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: 30880

@@ -1,1 +1,87 @@
 # Playbook Ansible pentru rularea platformei Docker folosind docker-compose.
+---
+- name: Deploy platforma monitorizare (monitorizare + backup)
+  hosts: remote
+  become: true
+  gather_facts: no
+
+  vars:
+    project_src: "/home/eu/Proiect_final"          # pe VM ubuntu
+    project_dst: "/home/proiect_final/Proiect_final" # pe VM remote
+    compose_file: "docker/docker-compose.yml"
+    logs_dir: "{{ project_dst }}/logs"
+    backup_dir: "{{ project_dst }}/backup"
+
+  tasks:
+    - name: Creez directoare pe remote
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: proiect_final
+        group: proiect_final
+        mode: "0755"
+      loop:
+        - "{{ project_dst }}"
+        - "{{ logs_dir }}"
+        - "{{ backup_dir }}"
+
+    - name: Copiez proiectul pe remote 
+      become: false
+      synchronize:
+        src: "{{ project_src }}/"
+        dest: "{{ project_dst }}/"
+      delegate_to: localhost
+
+    - name: Setez proprietarul pe proiect (pt. rulare fara root)
+      file:
+        path: "{{ project_dst }}"
+        state: directory
+        owner: proiect_final
+        group: proiect_final
+        recurse: true
+
+    - name: Pornesc stack-ul cu docker compose (detached)
+      become: false
+      command: docker compose -f "{{ project_dst }}/{{ compose_file }}" up -d
+      args:
+        chdir: "{{ project_dst }}"
+      register: compose_up
+
+    - name: Afisez rezumatul de la docker compose
+      debug:
+        var: compose_up.stdout_lines
+
+    # Verificari
+
+    - name: Astept sa se scrie primul log
+      wait_for:
+        path: "{{ logs_dir }}/VM-state.log"
+        state: present
+        timeout: 60
+
+    - name: Astept putin sa se creeze primul backup
+      pause:
+        seconds: 60
+
+    - name: Verific daca s-au creat fisiere in backup
+      find:
+        paths: "{{ backup_dir }}"
+        patterns: "VM-state.log__*"
+        file_type: file
+      register: backup_files
+
+    - name: Afisez fisierele de backup gasite
+      debug:
+        msg: "{{ backup_files.files | map(attribute='path') | list | default([]) }}"
+
+    - name: Mesah de eroare daca nu se genereaza backup-uri
+      fail:
+        msg: "Nu s-a generat niciun backup in {{ backup_dir }}. Verifica logurile containerelor."
+      when: backup_files.matched | int == 0
+
+    - name: Afisez containerele care ruleaza
+      command: docker ps --format "table {{'{{.Names}}\t{{.Image}}\t{{.Status}}'}}"
+      register: ps_out
+
+    - debug:
+        var: ps_out.stdout_lines

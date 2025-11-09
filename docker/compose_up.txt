@@ -1,0 +1,15 @@
+cd /home/eu/Proiect_final
+
+# build + run in background
+docker compose -f docker/docker-compose.yml build
+docker compose -f docker/docker-compose.yml up -d
+
+#run cu specificare variabile
+INTERVAL_RULARE=3 TOP_PROCESE=8 docker compose -f docker/docker-compose.yml up -d
+
+# verificari
+docker compose -f docker/docker-compose.yml ps
+docker compose -f docker/docker-compose.yml logs -f monitorizare backup
+
+# opresti
+docker compose -f docker/docker-compose.yml down
