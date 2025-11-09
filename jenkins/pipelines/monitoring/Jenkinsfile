@@ -81,10 +81,10 @@ pipeline {
       sh 'docker image ls | grep monitorizare || true'
     }
     success {
-      echo "Pipeline reușit: imagine ${IMAGE} construită și publicată."
+      echo "Pipeline reusit: imagine ${IMAGE} construită si publicată."
     }
     failure {
-      echo "Pipeline eșuat: verifică logurile de build/push/deploy."
+      echo "Pipeline esuat: verifică logurile de build/push/deploy."
     }
   }
 }

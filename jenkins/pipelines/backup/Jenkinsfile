@@ -97,10 +97,10 @@ pipeline {
       sh 'docker image ls | head -n 15 || true'
     }
     success {
-      echo "Pipeline reușit pentru ${IMAGE}"
+      echo "Pipeline reusit pentru ${IMAGE}"
     }
     failure {
-      echo "Pipeline eșuat pentru ${IMAGE}"
+      echo "Pipeline esuat pentru ${IMAGE}"
     }
   }
 }
