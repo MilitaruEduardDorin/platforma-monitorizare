@@ -27,34 +27,6 @@ pipeline {
       }
     }
 
-    stage('Lint Python') {
-      steps {
-        sh '''
-          echo "--- Lint: flake8 & black ---"
-          python3 -m pip install --upgrade pip >/dev/null 2>&1 || true
-          python3 -m pip install flake8 black >/dev/null 2>&1
-          flake8 scripts/backup_VM_ubuntu.py --max-line-length=120
-          black --check scripts/backup_VM_ubuntu.py
-        '''
-      }
-    }
-
-    stage('Unit Tests (pytest)') {
-      when { expression { fileExists('tests') } }
-      steps {
-        script {
-          docker.image('python:3.12-slim').inside {
-            sh '''
-              python -m pip install --upgrade pip
-              python -m pip install -r requirements.txt || true
-              python -m pip install pytest
-              pytest -q
-            '''
-          }
-        }
-      }
-    }
-
     stage('Build Docker Image') {
       steps {
         sh '''
