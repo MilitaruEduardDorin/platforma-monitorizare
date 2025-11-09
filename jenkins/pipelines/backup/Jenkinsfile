@@ -40,16 +40,18 @@ pipeline {
     }
 
     stage('Unit Tests (pytest)') {
+      when { expression { fileExists('tests') } }
       steps {
-        sh '''
-          echo "--- Rulez teste ---"
-          python3 -m pip install pytest >/dev/null 2>&1 || true
-          if [ -d tests ] || ls -1 test_*.py >/dev/null 2>&1; then
-            pytest -q
-          else
-            echo "Nu există teste definite. Continui pipeline-ul."
-          fi
-        '''
+        script {
+          docker.image('python:3.12-slim').inside {
+            sh '''
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements.txt || true
+              python -m pip install pytest
+              pytest -q
+            '''
+          }
+        }
       }
     }
 
