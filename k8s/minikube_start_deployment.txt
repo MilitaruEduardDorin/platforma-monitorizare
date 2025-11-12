@@ -17,6 +17,10 @@ kubectl -n monitoring get all
 kubectl -n monitoring get pods
 kubectl -n monitoring describe pod -l app=system-monitor
 
+#stergere pod-uri
+kubectl -n monitoring delete pods -l app=system-monitor  # se vor recrea automat pe baza deployment.yaml deja aplicat
+kubectl -n monitoring delete deployment system-monitor #sterge tot deployment-ul si trebuie re-aplicat
+
 # vezi logurile
 kubectl -n monitoring logs -l app=system-monitor -c monitorizare --tail=50
 kubectl -n monitoring logs -l app=system-monitor -c backup --tail=50

@@ -51,9 +51,9 @@ spec:
     spec:
       containers:
         - name: monitorizare
-          image: militarueduarddorin/monitorizare:latest
+          image: proiect-final/monitorizare:latest
           #pentru a folosi mereu docker images locale
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: INTERVAL_RULARE
               value: "5"
@@ -75,9 +75,9 @@ spec:
               memory: "256Mi"
 
         - name: backup
-          image: militarueduarddorin/backup:latest
+          image: proiect-final/backup:latest
           #pentru a folosi mereu docker images locale
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           env:
             - name: SOURCE_FILE
               value: "/logs/VM-state.log"
